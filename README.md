@@ -1,78 +1,63 @@
-Scrapes data from a website with BeautifulSoup.
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-import time
+# Web Scraper
 
+A lightweight Python application that demonstrates the basic workflow of a web scraper.
 
-class WebScraper:
-    def __init__(self, base_url, delay=1):
-        self.base_url = base_url
-        self.visited = set()
-        self.delay = delay
+## Overview
 
-    def fetch_page(self, url):
-        try:
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            return response.text
-        except requests.RequestException as e:
-            print(f"[ERROR] Failed to fetch {url}: {e}")
-            return None
+Web Scraper simulates downloading an HTML page, extracting useful information, and exporting the collected data.
 
-    def parse_links(self, html, current_url):
-        soup = BeautifulSoup(html, "html.parser")
-        links = set()
+The project demonstrates modular architecture, text parsing, and clean separation of responsibilities.
 
-        for tag in soup.find_all("a", href=True):
-            full_url = urljoin(current_url, tag["href"])
-            if self.base_url in full_url:
-                links.add(full_url)
+## Features
 
-        return links
+- Download page content (simulation)
+- Parse HTML
+- Extract article titles
+- Export results
+- Console report
 
-    def extract_data(self, html):
-        soup = BeautifulSoup(html, "html.parser")
+## Project Structure
 
-        title = soup.title.string.strip() if soup.title else "No title"
+```
+.
+├── main.py
+├── fetcher.py
+├── parser.py
+├── extractor.py
+├── models.py
+├── exporter.py
+├── sample_html.py
+├── settings.py
+└── README.md
+```
 
-        headings = [h.get_text(strip=True) for h in soup.find_all(["h1", "h2"])]
+## Example Output
 
-        return {
-            "title": title,
-            "headings": headings
-        }
+```
+========= WEB SCRAPER =========
 
-    def crawl(self, max_pages=5):
-        to_visit = [self.base_url]
+Downloading page...
 
-        while to_visit and len(self.visited) < max_pages:
-            url = to_visit.pop(0)
+Articles found:
 
-            if url in self.visited:
-                continue
+Python News
+Open Source Weekly
+AI Trends
 
-            print(f"[INFO] Crawling: {url}")
-            html = self.fetch_page(url)
+----------------------
+Total Articles: 3
+```
 
-            if not html:
-                continue
+## Technologies
 
-            data = self.extract_data(html)
-            print(f"[DATA] Title: {data['title']}")
-            print(f"[DATA] Headings: {data['headings']}\n")
+- Python 3
 
-            self.visited.add(url)
+## Future Improvements
 
-            links = self.parse_links(html, url)
-            for link in links:
-                if link not in self.visited:
-                    to_visit.append(link)
+- requests
+- BeautifulSoup
+- Async scraping
+- CSV export
+- JSON export
 
-            time.sleep(self.delay)
-
-
-if __name__ == "__main__":
-    url = input("Enter website URL: ").strip()
-    scraper = WebScraper(url, delay=1)
-    scraper.crawl(max_pages=5)
+MIT License
