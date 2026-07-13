@@ -1,0 +1,3 @@
+APP_NAME = "WEB SCRAPER"
+
+SEPARATOR = "=" * 35
